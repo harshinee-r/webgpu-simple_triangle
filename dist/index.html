@@ -684,7 +684,10 @@ async function dr() {
 }
 dr();
 
-},{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3","bundle-text:./shader1.wgsl":"NMKlA"}],"gkKU3":[function(require,module,exports) {
+},{"bundle-text:./shader1.wgsl":"NMKlA","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"NMKlA":[function(require,module,exports) {
+module.exports = "struct vout{\r\n    @builtin(position) p:vec4<f32>,\r\n    @location(0) col:vec4<f32>,\r\n};\r\n@vertex\r\nfn vertexMain(@builtin(vertex_index) vi:u32)-> vout{\r\n    var pos=array<vec2<f32>,3>(\r\n        vec2(0.0,0.5),vec2(-0.5,-0.5),vec2(0.5,-0.5)\r\n    );\r\n    var colour=array<vec4<f32>,3>(\r\n        vec4(1,0,0,1), vec4(0,1,0,1), vec4(0,0,1,1)\r\n    );\r\n    var vout1:vout;\r\n    vout1.p= vec4f(pos[vi],0,1);\r\n    vout1.col=colour[vi];\r\n    return vout1;\r\n}\r\n@fragment\r\nfn fragmentMain(v:vout)-> @location(0) vec4f{\r\n    \r\n    return v.col;\r\n}";
+
+},{}],"gkKU3":[function(require,module,exports) {
 exports.interopDefault = function(a) {
     return a && a.__esModule ? a : {
         default: a
@@ -713,9 +716,6 @@ exports.export = function(dest, destName, get) {
         get: get
     });
 };
-
-},{}],"NMKlA":[function(require,module,exports) {
-module.exports = "struct vout{\r\n    @builtin(position) p:vec4<f32>,\r\n    @location(0) col:vec4<f32>,\r\n};\r\n@vertex\r\nfn vertexMain(@builtin(vertex_index) vi:u32)-> vout{\r\n    var pos=array<vec2<f32>,3>(\r\n        vec2(0.0,0.5),vec2(-0.5,-0.5),vec2(0.5,-0.5)\r\n    );\r\n    var colour=array<vec4<f32>,3>(\r\n        vec4(1,0,0,1), vec4(0,1,0,1), vec4(0,0,1,1)\r\n    );\r\n    var vout1:vout;\r\n    vout1.p= vec4f(pos[vi],0,1);\r\n    vout1.col=colour[vi];\r\n    return vout1;\r\n}\r\n@fragment\r\nfn fragmentMain(v:vout)-> @location(0) vec4f{\r\n    \r\n    return v.col;\r\n}";
 
 },{}]},["arGCG","853Qk"], "853Qk", "parcelRequire94c2")
 
