@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <!-- <link rel="stylesheets" href="styles.css">  -->
+        <link rel="stylesheet" href="styles.css">
+        <title>
+            triangle-webgpu
+        </title>
+    </head>
+    <body>
+        
+        <canvas></canvas>
+        <script type="module">
+            import shader from "bundle-text:./shader1.wgsl";
+            // canvas.classList.add(styles.animatedCanvasSize);
+
+
+            async function dr(){
+                const canvas = document.querySelector("canvas");
+                const ad = await navigator.gpu.requestAdapter();
+                if(!ad){
+                    throw new Error("not found on this browser");
+                }
+                const device=await ad.requestDevice();
+
+                const c=canvas.getContext("webgpu");
+                const cf=navigator.gpu.getPreferredCanvasFormat();
+                c.configure({
+                    device:device,
+                    format:cf,
+                    //alphaMode:"premultiplied"
+                });
+
+                // const vertices=new Float32Array([
+                //     0,0.8,
+                //     0.8,-0.8,
+                //     -0.8,-0.8
+
+                // ])
+                // const verticesbuffer=device.createBuffer({
+                //     label:"vertices",
+                //     size:vertices.byteLength,
+                //     usage: GPUBufferUsage.VERTEX | GPUBufferUsage.COPY_DST,
+                // });
+                // device.queue.writeBuffer(verticesbuffer,/*buffer offset*/ 0,vertices);
+                // const VertexBufferLayout={
+                //     arrayStride:8,
+                //     attributes:[{
+                //         format:"float32x2",
+                //         offset:0,
+                //         shaderLocation:0,
+                //     }],
+
+                //};
+                const cellshaderModule=device.createShaderModule({
+                    label:"cellshader",
+                    code: shader,
+                });
+                function render(){
+                const cellPipeline=device.createRenderPipeline({
+                    label:"cell pipeline",
+                    layout:"auto",
+                    vertex:{
+                        module: cellshaderModule,
+                        entryPoint:"vertexMain",
+                        // buffers:[VertexBufferLayout],
+                    },
+                    fragment:{
+                        module: cellshaderModule,
+                        entryPoint:"fragmentMain",
+                        targets:[{format:cf}]
+                    },
+                    primitive: { topology: `triangle-list` },
+                    
+                });
+                const coder=device.createCommandEncoder();
+                const pass=coder.beginRenderPass(
+                    {
+                        colorAttachments:[{
+                            view:c.getCurrentTexture().createView(),
+                            clearValue:{r:0,g:0,b:0,a:1},
+                            loadOp:"clear",
+                            storeOp:"store",
+
+                        }]
+                    }
+                );
+                pass.setPipeline(cellPipeline);
+                // pass.setVertexBuffer(0,verticesbuffer);
+                pass.draw(3);
+                pass.end();
+                device.queue.submit([coder.finish()]);}
+                const observer = new ResizeObserver(entries => {
+                for (const entry of entries) {
+                    const canvas = entry.target;
+                    const width = entry.contentBoxSize[0].inlineSize;
+                    const height = entry.contentBoxSize[0].blockSize;
+                    canvas.width = Math.max(1, Math.min(width, device.limits.maxTextureDimension2D));
+                    canvas.height = Math.max(1, Math.min(height, device.limits.maxTextureDimension2D));
+                    // re-render
+                   render();
+                }
+    });
+    observer.observe(canvas);
+            
+            }
+
+
+            dr();
+        </script>
+    </body>
+</html>
